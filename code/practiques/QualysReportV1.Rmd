@@ -1,0 +1,154 @@
+---
+title: "Analysis of Qualys KDB"
+author: "Humbert Costas"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(kableExtra)
+
+#XAVIER I ISARN
+library(xml2)
+
+raw.file = "../../data/qualys/latest.qkdb.xml.zip"
+```
+
+# Qualys KDB
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam vitae erat dignissim, placerat nisi vitae, viverra ipsum. Etiam consectetur mattis pellentesque. Duis at porttitor eros. Morbi nisl eros, luctus efficitur dui ac, ultricies vulputate leo. Vestibulum accumsan, nunc id faucibus finibus, tellus ipsum venenatis odio, in luctus nisi lectus vel orci. Etiam pretium imperdiet lobortis. Vestibulum ut neque nec erat tempor laoreet et at erat. Nam varius dolor non neque maximus, ut egestas enim ultrices. Integer porttitor, leo id ornare pharetra, tellus erat cursus metus, eget rutrum augue dui at justo.
+
+```{r read_raw}
+doc <- xml2::read_xml(raw.file)
+
+#XAVIER I ISARN
+#xml <- read_xml(raw.file)
+
+#FUNCIONA FALTA SI NO EXISTEIX
+#cve_id <- rvest::html_text(rvest::html_elements(xml, xpath = "//VULN/QID"))
+
+#cve_id <- ifelse(length(rvest::html_elements(xml, xpath = "//VULN/QID")) > 0, rvest::html_text(rvest::html_elements(doc, xpath = "//VULN/CVE_LIST/CVE/ID")), NA)
+
+
+# Encuentra todos los elementos ID
+#id_nodes <- xml_find_all(xml, "//VULN/CVE_LIST/CVE/ID")
+
+#cve_id <- xml_find_all(doc, "//VULN/CVE_LIST/CVE/ID") %>% 
+#  xml_text() %>% 
+#  as.character()
+
+#id_list <- list()
+
+# Recorrer los nodos VULN
+#for (i in 1:length(vuln_nodes)) {
+  
+  # Encontrar los nodos ID correspondientes a este nodo VULN
+ # id_nodes <- xml_find_all(vuln_nodes[i], "./CVE_LIST/CVE/ID")
+  
+  # Guardar los valores de ID en un vector
+  #id_vector <- xml_text(id_nodes)
+  
+  # Añadir el vector a la lista
+  #id_list[[i]] <- id_vector
+  
+#}
+
+# Usa ifelse para asignar los valores de ID a cve_id, o NA si no hay valores de ID
+#cve_id <- ifelse(length(id_nodes) > 0, xml_text(id_nodes), NA)
+#if (length(id_nodes) > 0) {
+#LLISTAT
+#  cve_id <- xml_text(id_nodes)
+#  cve_id <- replace(cve_id, is.na(cve_id), 0)
+# VECTOR
+#    cve_id <- unlist(xml_text(id_nodes))
+#    cve_id[is.na(cve_id)] <- 0
+#CONCATENAT, pero en un sol camp
+#  cve_id <- paste(xml_text(id_nodes), collapse = ", ")
+#  } else {
+#  cve_id <- NA
+#}
+
+# Imprime los valores de cve_id
+#qid <- rvest::html_text(rvest::html_elements(doc, xpath = "//VULN/QID"))
+#print qid
+#print(cve_id)
+
+#qid = rvest::html_text(rvest::html_elements(doc, xpath = "//VULN/QID"
+#print(qid)
+#cve_ids <- xml_find_all(doc, "//VULN") %>% lapply(function(x) {     ifelse(length(xml_find_all(x, "./QID")) > 0,            xml_text(xml_find_all(x, "./QID")),            NA)  })
+
+#cve_id <- ifelse(length(rvest::html_elements(doc, xpath = "//VULN/CVE/ID")) > 0,             rvest::html_text(rvest::html_elements(doc, xpath = "//VULN/CVE/ID")),                  NA)
+
+# SEGON INTENT V2
+
+
+#library(xml2)
+#library(dplyr)
+#library(tidyr)
+
+
+# Encuentra todos los elementos QID y sus nodos padres
+#nodes <- xml_find_all(xml, "//VULN/CVE_LIST/CVE/ID/..")
+
+# Crea un dataframe con los valores de QID
+#df <- tibble(
+#  CVE = xml_text(xml_find_all(nodes, "ID")),
+#  otro_campo = xml_text(xml_find_all(nodes, "QID"))
+#)
+
+# Rellena los valores faltantes en la columna QID
+#df <- fill(df, CVE)
+
+# Muestra el dataframe
+#df
+
+
+#df <- data.frame (qid = qid, cve_id = cve_id)
+
+kdb <- data.frame(qid = rvest::html_text(rvest::html_elements(doc, xpath = "//VULN/QID")),
+                  title = rvest::html_text(rvest::html_elements(doc, xpath = "//VULN/TITLE")),
+                  vuln_type = rvest::html_text(rvest::html_elements(doc, xpath = "//VULN/VULN_TYPE")),
+                  category = rvest::html_text(rvest::html_elements(doc, xpath = "//VULN/CATEGORY")),
+                  severity = rvest::html_text(rvest::html_elements(doc, xpath = "//VULN/SEVERITY_LEVEL")),
+                  patchable = rvest::html_text(rvest::html_elements(doc, xpath = "//VULN/PATCHABLE")),
+#                  cve_id = cve_id,
+                  published = rvest::html_text(rvest::html_elements(doc, xpath = "//VULN/LAST_SERVICE_MODIFICATION_DATETIME")),
+                  diagnosis = rvest::html_text(rvest::html_elements(doc, xpath = "//VULN/DIAGNOSIS")),
+
+                  stringsAsFactors = FALSE)
+kdb$published <- as.POSIXct.POSIXlt(strptime(x = kdb$published, format = "%Y-%m-%dT%TZ"))
+
+
+kable(head(kdb)) %>% kable_styling()
+```
+
+## Including Cybersecurity Standards
+
+Aliquam erat volutpat. Proin eget arcu et erat viverra eleifend. Quisque suscipit interdum blandit. Cras suscipit, nibh at mattis varius, purus massa pretium est, a malesuada felis velit sed leo. Nam quis malesuada orci. Aliquam consectetur molestie purus in rutrum. Curabitur purus libero, blandit vitae tempus quis, pharetra sit amet ex. Integer ligula lorem, gravida ac dui rutrum, sodales egestas augue. Etiam bibendum risus elit, quis dictum erat tristique id. Sed vulputate, turpis vel commodo molestie, lacus dui varius velit, vitae maximus tellus neque in urna. Donec non purus elementum, condimentum mi eu, semper dolor. Suspendisse malesuada turpis vel libero blandit varius. Cras rhoncus facilisis nunc sed efficitur. Suspendisse suscipit vel dui ut semper. Donec pellentesque tincidunt tincidunt.
+
+```{r add_cve, echo=FALSE}
+
+
+```
+
+```{r add_cwe, echo=FALSE}
+
+
+```
+
+```{r add_cpe, echo=FALSE}
+
+
+```
+
+## Conclusion
+
+Ut finibus, metus in tristique blandit, purus quam vulputate sapien, vitae rhoncus nunc orci et leo. Duis id justo bibendum, molestie nulla eget, ullamcorper massa. Sed porttitor leo tellus, a tristique nisi tincidunt lobortis. Donec in orci imperdiet, lobortis lorem hendrerit, vestibulum dolor. Proin laoreet, orci at iaculis blandit, odio ligula commodo nunc, eu pulvinar justo tortor sed eros. Ut convallis condimentum purus, ac viverra neque maximus ac. Vestibulum consequat facilisis odio vel tempor.
+
+
+
+
+
+
